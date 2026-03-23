@@ -1,6 +1,6 @@
 /**
  * PlantLight — app.js
- * Geolocalización, fetch del reporte de luz e inicialización de Chart.js
+ * Mapa Leaflet, geolocalización, fetch del reporte de luz e inicialización de Chart.js
  */
 
 // ─── Estado global ──────────────────────────────────────────────────────────
@@ -8,13 +8,91 @@ let currentLat = -34.6;   // Buenos Aires por defecto
 let currentLon = -58.4;
 let spectrumChart = null;
 let dailyChart = null;
+let map = null;
+let marker = null;
 
 // ─── Inicialización ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    initMap();
     setupGeolocateButton();
     setupDatetimeButton();
     setupModalClose();
 });
+
+// ─── Mapa Leaflet ─────────────────────────────────────────────────────────
+function initMap() {
+    const mapEl = document.getElementById('map');
+    if (!mapEl || typeof L === 'undefined') return;
+
+    map = L.map('map').setView([currentLat, currentLon], 4);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+        maxZoom: 18,
+    }).addTo(map);
+
+    // Icono personalizado (verde)
+    const greenIcon = L.divIcon({
+        html: '<div class="map-marker-pin"></div>',
+        className: '',
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
+    });
+
+    marker = L.marker([currentLat, currentLon], { icon: greenIcon, draggable: true }).addTo(map);
+    updateCoordsDisplay(currentLat, currentLon);
+
+    // Click en el mapa → mover marcador y cargar reporte
+    map.on('click', (e) => {
+        const { lat, lng } = e.latlng;
+        moveMarker(lat, lng);
+        fetchReport(lat, lng);
+    });
+
+    // Drag del marcador
+    marker.on('dragend', () => {
+        const { lat, lng } = marker.getLatLng();
+        currentLat = lat;
+        currentLon = lng;
+        updateCoordsDisplay(lat, lng);
+        fetchReport(lat, lng);
+    });
+}
+
+function moveMarker(lat, lng) {
+    currentLat = lat;
+    currentLon = lng;
+    if (marker) marker.setLatLng([lat, lng]);
+    if (map) map.panTo([lat, lng]);
+    updateCoordsDisplay(lat, lng);
+}
+
+async function reverseGeocode(lat, lng) {
+    try {
+        const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+            { headers: { 'Accept-Language': 'es' } }
+        );
+        const data = await res.json();
+        const city    = data.address?.city || data.address?.town || data.address?.village || '';
+        const country = data.address?.country_code?.toUpperCase() || '';
+        return city && country ? `${city}, ${country}` : null;
+    } catch {
+        return null;
+    }
+}
+
+function updateCoordsDisplay(lat, lng) {
+    const el = document.getElementById('coords-display');
+    if (!el) return;
+    const latStr = lat.toFixed(2);
+    const lngStr = lng.toFixed(2);
+    el.textContent = `(${latStr}, ${lngStr})`;
+    // Intentar reverse geocoding en background
+    reverseGeocode(lat, lng).then(name => {
+        if (name && el) el.textContent = `${name} (${latStr}, ${lngStr})`;
+    });
+}
 
 // ─── Botón de geolocalización ─────────────────────────────────────────────
 function setupGeolocateButton() {
@@ -23,25 +101,27 @@ function setupGeolocateButton() {
 
     btn.addEventListener('click', () => {
         if (!navigator.geolocation) {
-            fetchReport(-34.6, -58.4, null, 'Buenos Aires (defecto)');
+            moveMarker(-34.6, -58.4);
+            fetchReport(-34.6, -58.4);
             return;
         }
         btn.disabled = true;
-        btn.textContent = 'Detectando…';
-        showLoading(true);
+        btn.innerHTML = '<span class="btn-icon">⏳</span> Detectando…';
 
         navigator.geolocation.getCurrentPosition(
             (pos) => {
-                currentLat = pos.coords.latitude;
-                currentLon = pos.coords.longitude;
+                const { latitude, longitude } = pos.coords;
                 btn.disabled = false;
-                btn.innerHTML = '<span class="btn-icon">📍</span> Detectar mi ubicación';
-                fetchReport(currentLat, currentLon);
+                btn.innerHTML = '<span class="btn-icon">📍</span> Mi ubicación';
+                moveMarker(latitude, longitude);
+                if (map) map.setView([latitude, longitude], 10);
+                fetchReport(latitude, longitude);
             },
             () => {
                 btn.disabled = false;
-                btn.innerHTML = '<span class="btn-icon">📍</span> Detectar mi ubicación';
-                fetchReport(-34.6, -58.4);   // fallback Buenos Aires
+                btn.innerHTML = '<span class="btn-icon">📍</span> Mi ubicación';
+                moveMarker(-34.6, -58.4);
+                fetchReport(-34.6, -58.4);
             },
             { timeout: 8000 }
         );
