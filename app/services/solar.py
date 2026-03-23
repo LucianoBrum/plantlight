@@ -173,8 +173,12 @@ def get_light_metrics(lat: float, lon: float, dt: Optional[datetime] = None) -> 
         daylight_hours = float((sun_positions["elevation"] > 0).sum())
 
         clearsky_night = location.get_clearsky(times_day)
-        par_umol_night = clearsky_night["ghi"].values * 0.45 * 4.57
-        current_hour_night = int(pd.Timestamp(dt_calc).hour)
+        par_umol_night_raw = clearsky_night["ghi"].values * 0.45 * 4.57
+        utc_offset_h_night = round(lon / 15)
+        local_start_utc_night = (-utc_offset_h_night) % 24
+        par_umol_night = np.roll(par_umol_night_raw, -local_start_utc_night)
+        ts_night = pd.Timestamp(dt_calc)
+        current_hour_night = (ts_night.hour + utc_offset_h_night) % 24
 
         return {
             "sun_is_up": False,
@@ -224,10 +228,16 @@ def get_light_metrics(lat: float, lon: float, dt: Optional[datetime] = None) -> 
     dli = float((par_umol_hourly * 3600 / 1_000_000).sum())
 
     # Historial diario: PAR hora a hora para el gráfico de evolución del día
-    current_hour = int(pd.Timestamp(dt_calc).hour)
+    # Rotamos el array para que el índice 0 corresponda a medianoche solar local,
+    # y el marcador de hora actual apunte al índice correcto dentro del array rotado.
+    utc_offset_h = round(lon / 15)  # offset entero más cercano (sin DST)
+    local_start_utc = (-utc_offset_h) % 24   # índice UTC que equivale a medianoche local
+    par_rotated = np.roll(par_umol_hourly, -local_start_utc)
+    ts = pd.Timestamp(dt_calc)
+    current_hour = (ts.hour + utc_offset_h) % 24
     daily_par_chart = {
         "hours": list(range(24)),
-        "par_umol": [round(float(v), 1) for v in par_umol_hourly],
+        "par_umol": [round(float(v), 1) for v in par_rotated],
         "current_hour": current_hour,
     }
 
