@@ -1,0 +1,7 @@
+plantlight-env/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.env
+*.db-journal

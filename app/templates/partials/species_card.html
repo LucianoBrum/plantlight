@@ -1,0 +1,45 @@
+{% if species_list %}
+{% for sp in species_list %}
+<div class="species-card" data-species-id="{{ sp.id }}">
+    <div class="species-card-body">
+        <div class="species-light-badge badge-{{ sp.light_requirement }}">
+            {% if sp.light_requirement == 'full_sun' %}☀️ Sol pleno
+            {% elif sp.light_requirement == 'partial_shade' %}⛅ Sombra parcial
+            {% elif sp.light_requirement == 'full_shade' %}🌑 Sombra total
+            {% else %}🔄 Variable{% endif %}
+        </div>
+        <h3 class="species-common-name">{{ sp.common_name }}</h3>
+        <p class="species-sci-name"><em>{{ sp.scientific_name }}</em></p>
+        {% if sp.family %}<p class="species-family">Familia: {{ sp.family }}</p>{% endif %}
+
+        <div class="species-par-info">
+            <div class="par-mini-stat">
+                <span class="par-value">{{ sp.par_optimal_umol | round(0) | int }}</span>
+                <span class="par-unit">µmol/m²/s</span>
+                <span class="par-label">PAR óptimo</span>
+            </div>
+            <div class="par-mini-stat">
+                <span class="par-value">{{ sp.dli_optimal | round(0) | int }}</span>
+                <span class="par-unit">mol/m²/día</span>
+                <span class="par-label">DLI óptimo</span>
+            </div>
+        </div>
+
+        {% if sp.photoperiod_type %}
+        <div class="photoperiod-badge badge-{{ sp.photoperiod_type }}">
+            {% if sp.photoperiod_type == 'short_day' %}🌘 Día corto
+            {% elif sp.photoperiod_type == 'long_day' %}🌔 Día largo
+            {% else %}☯️ Neutro{% endif %}
+        </div>
+        {% endif %}
+    </div>
+    <button class="btn-species-detail" onclick="openSpeciesDetail({{ sp.id }})">
+        Ver análisis de luz →
+    </button>
+</div>
+{% endfor %}
+{% else %}
+<div class="no-results">
+    <p>No se encontraron especies. Probá con otro término.</p>
+</div>
+{% endif %}

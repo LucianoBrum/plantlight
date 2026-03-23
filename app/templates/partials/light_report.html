@@ -1,0 +1,206 @@
+{% if report.sun_is_up %}
+<div class="report-grid">
+
+    <!-- Gauge de calidad -->
+    <div class="card card-gauge">
+        <div class="gauge-wrapper">
+            <div class="gauge" style="--score: {{ report.quality.total }}">
+                <div class="gauge-inner">
+                    <span class="gauge-value">{{ report.quality.total }}</span>
+                    <span class="gauge-unit">/100</span>
+                    <span class="gauge-label">{{ report.quality.label }}</span>
+                </div>
+            </div>
+        </div>
+        {% if species is defined and species %}
+        <div class="species-badge">
+            <span class="species-name">{{ species.common_name }}</span>
+            <span class="species-sci">{{ species.scientific_name }}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Resumen del día -->
+    <div class="card card-summary">
+        <h3 class="card-title">Resumen del día</h3>
+        <div class="stats-grid">
+            <div class="stat">
+                <span class="stat-value">{{ report.par_umol | round(0) | int }}</span>
+                <span class="stat-unit">µmol/m²/s</span>
+                <span class="stat-label">PAR actual</span>
+                <span class="stat-category {{ report.par_classification | replace(' ', '-') }}">{{ report.par_classification }}</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">{{ report.dli_estimated | round(1) }}</span>
+                <span class="stat-unit">mol/m²/día</span>
+                <span class="stat-label">DLI estimado</span>
+                <span class="stat-category">{{ report.dli_classification }}</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value">{{ report.daylight_hours | round(0) | int }}</span>
+                <span class="stat-unit">horas</span>
+                <span class="stat-label">Horas de luz</span>
+            </div>
+            <div class="stat">
+                {% if report.r_fr_ratio %}
+                <span class="stat-value">{{ report.r_fr_ratio }}</span>
+                <span class="stat-unit">R:FR</span>
+                <span class="stat-label">Ratio rojo/lejano</span>
+                {% else %}
+                <span class="stat-value">—</span>
+                <span class="stat-label">Ratio R:FR</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="solar-position">
+            <span>☀️ Elevación: <strong>{{ report.solar_position.elevation | round(1) }}°</strong></span>
+            <span>Azimut: <strong>{{ report.solar_position.azimuth | round(0) | int }}°</strong></span>
+            {% if report.airmass %}
+            <span>Masa de aire: <strong>{{ report.airmass | round(2) }}</strong></span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Espectro solar -->
+    <div class="card card-spectrum">
+        <h3 class="card-title">Espectro solar</h3>
+        <div class="spectrum-chart-wrapper">
+            <canvas id="spectrum-chart"
+                data-wavelengths="{{ report.spectrum.wavelengths | tojson }}"
+                data-irradiance="{{ report.spectrum.irradiance | tojson }}">
+            </canvas>
+        </div>
+        <div class="band-legend">
+            <span class="band-dot band-uv">UV-A</span>
+            <span class="band-dot band-blue">Azul</span>
+            <span class="band-dot band-green">Verde</span>
+            <span class="band-dot band-red">Rojo</span>
+            <span class="band-dot band-far-red">Rojo lejano</span>
+        </div>
+    </div>
+
+    <!-- Desglose espectral -->
+    <div class="card card-bands">
+        <h3 class="card-title">Distribución espectral (PAR)</h3>
+        <div class="band-bars">
+            {% for band, pct in report.bands_percent.items() %}
+            <div class="band-bar-row">
+                <span class="band-name band-{{ band }}">
+                    {% if band == 'blue' %}Azul (400–500 nm)
+                    {% elif band == 'green' %}Verde (500–600 nm)
+                    {% elif band == 'red' %}Rojo (600–700 nm)
+                    {% endif %}
+                </span>
+                <div class="band-bar-track">
+                    <div class="band-bar-fill band-fill-{{ band }}" style="width: {{ pct }}%"></div>
+                </div>
+                <span class="band-pct">{{ pct }}%</span>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="band-extras">
+            <div class="band-extra-item">
+                <span class="band-dot band-uv">UV-A</span>
+                <span>{{ report.bands_w_m2.uv_a | round(1) }} W/m²</span>
+            </div>
+            <div class="band-extra-item">
+                <span class="band-dot band-far-red">Rojo lejano</span>
+                <span>{{ report.bands_w_m2.far_red | round(1) }} W/m²</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Procesos fisiológicos -->
+    <div class="card card-processes">
+        <h3 class="card-title">Procesos fisiológicos activos</h3>
+        {% if report.active_processes %}
+        <div class="processes-list">
+            {% for proc in report.active_processes %}
+            <div class="process-item process-{{ proc.band }} process-level-{{ proc.level }}">
+                <div class="process-header">
+                    <span class="process-band-dot band-{{ proc.band }}"></span>
+                    <span class="process-band-name">
+                        {% if proc.band == 'red' %}Rojo{% elif proc.band == 'blue' %}Azul{% elif proc.band == 'green' %}Verde{% elif proc.band == 'far_red' %}Rojo lejano{% elif proc.band == 'uv_a' %}UV-A{% endif %}
+                    </span>
+                    <span class="process-level-badge level-{{ proc.level }}">{{ proc.level }}</span>
+                </div>
+                <ul class="process-list-items">
+                    {% for p in proc.processes %}
+                    <li>{{ p }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="muted">No hay procesos activos detectados.</p>
+        {% endif %}
+    </div>
+
+    <!-- Comparación con especie (si aplica) -->
+    {% if report.species_comparison %}
+    {% set comp = report.species_comparison %}
+    <div class="card card-species-compare level-{{ comp.recommendation_level }}">
+        <h3 class="card-title">Comparación con la especie</h3>
+        <div class="compare-recommendation recommendation-{{ comp.recommendation_level }}">
+            <span class="rec-icon">
+                {% if comp.recommendation_level == 'success' %}✅
+                {% elif comp.recommendation_level == 'warning' %}⚠️
+                {% elif comp.recommendation_level == 'danger' %}🚫
+                {% else %}ℹ️{% endif %}
+            </span>
+            <strong>{{ comp.recommendation }}</strong>
+        </div>
+        <div class="compare-details">
+            <div class="compare-item">
+                <span class="compare-label">PAR</span>
+                <span class="compare-value status-{{ comp.par_status }}">{{ comp.par_message }}</span>
+            </div>
+            <div class="compare-item">
+                <span class="compare-label">DLI</span>
+                <span class="compare-value status-{{ comp.dli_status }}">{{ comp.dli_message }}</span>
+            </div>
+        </div>
+        <div class="par-range-bar">
+            <div class="par-range-track">
+                <div class="par-range-min" style="left: 0%"></div>
+                <div class="par-range-optimal"
+                    style="left: {{ [comp.species_par_min / comp.species_par_max * 100, 100] | min }}%;
+                           width: {{ [(comp.species_par_optimal - comp.species_par_min) / comp.species_par_max * 100, 0] | max }}%">
+                </div>
+                {% set par_pos = [comp.current_par / comp.species_par_max * 100, 100] | min %}
+                <div class="par-current-marker" style="left: {{ par_pos }}%"
+                     title="Actual: {{ comp.current_par | round(0) | int }} µmol/m²/s"></div>
+            </div>
+            <div class="par-range-labels">
+                <span>0</span>
+                <span>{{ comp.species_par_min | round(0) | int }} mín</span>
+                <span>{{ comp.species_par_optimal | round(0) | int }} ópt</span>
+                <span>{{ comp.species_par_max | round(0) | int }} máx</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div><!-- .report-grid -->
+
+{% else %}
+<!-- Sol bajo el horizonte -->
+<div class="card night-card">
+    <div class="night-icon">🌙</div>
+    <h2>El sol está bajo el horizonte</h2>
+    <p>No hay luz solar disponible en este momento en tu ubicación.</p>
+    <div class="night-stats">
+        <div class="stat">
+            <span class="stat-value">{{ report.daylight_hours | round(0) | int }}</span>
+            <span class="stat-unit">horas</span>
+            <span class="stat-label">Horas de luz hoy</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value">{{ report.solar_position.elevation | round(1) }}°</span>
+            <span class="stat-label">Elevación solar</span>
+        </div>
+    </div>
+    <p class="night-tip">Usá el selector de fecha y hora para simular la luz a otro momento del día.</p>
+</div>
+{% endif %}

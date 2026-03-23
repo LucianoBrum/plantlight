@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PlantLight{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <header class="site-header">
+        <a href="/" class="logo">🌿 PlantLight</a>
+        <nav>
+            <a href="/" class="{% if request.url.path == '/' %}active{% endif %}">Inicio</a>
+            <a href="/species" class="{% if request.url.path == '/species' %}active{% endif %}">Especies</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <p>PlantLight — Calidad de luz solar para tus plantas</p>
+    </footer>
+
+    <script src="/static/js/app.js" defer></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,760 @@
+/* ============================================================
+   PlantLight — Estilos principales
+   ============================================================ */
+
+:root {
+    --color-bg: #f5f2eb;
+    --color-surface: #ffffff;
+    --color-surface-2: #faf8f4;
+    --color-border: #e0d9ce;
+    --color-primary: #2d5a27;
+    --color-primary-light: #4a7c43;
+    --color-accent: #c8872a;
+    --color-accent-light: #e8a84a;
+    --color-text: #1a1a1a;
+    --color-muted: #6b6452;
+    --color-danger: #b84040;
+    --color-warning: #b87820;
+    --color-success: #2d7a3a;
+    --color-info: #2a6a8a;
+
+    /* Bandas espectrales */
+    --color-uv:       #9b59b6;
+    --color-blue:     #3498db;
+    --color-green:    #27ae60;
+    --color-red:      #e74c3c;
+    --color-far-red:  #8e3030;
+    --color-ir:       #c0392b;
+
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 12px rgba(0,0,0,.07);
+    --shadow-md: 0 4px 24px rgba(0,0,0,.1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: var(--font-body);
+    background: var(--color-bg);
+    color: var(--color-text);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+/* ---- Header ---- */
+.site-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+}
+
+.logo {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+nav a {
+    margin-left: 1.5rem;
+    color: var(--color-muted);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+nav a:hover, nav a.active { color: var(--color-primary); }
+
+/* ---- Main layout ---- */
+main { max-width: 1000px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+
+/* ---- Hero ---- */
+.hero {
+    text-align: center;
+    padding: 3.5rem 1rem 2.5rem;
+}
+
+.hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    color: var(--color-primary);
+    line-height: 1.15;
+    margin-bottom: 1rem;
+}
+.hero h1 em { font-style: italic; color: var(--color-accent); }
+
+.subtitle {
+    color: var(--color-muted);
+    font-size: 1.05rem;
+    max-width: 520px;
+    margin: 0 auto 2rem;
+}
+
+.hero-actions { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
+
+.hero-hint { font-size: 0.85rem; color: var(--color-muted); }
+
+.datetime-picker {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+input[type="datetime-local"] {
+    padding: 0.5rem 0.75rem;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+}
+input[type="datetime-local"]:focus { outline: none; border-color: var(--color-primary); }
+
+/* ---- Buttons ---- */
+.btn-primary {
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 0.8rem 2rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-primary:hover { background: var(--color-primary-light); }
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-secondary {
+    background: var(--color-surface);
+    color: var(--color-primary);
+    border: 1.5px solid var(--color-primary);
+    padding: 0.5rem 1.2rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-secondary:hover { background: #eef5ec; }
+
+/* ---- Loading ---- */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 3rem;
+    color: var(--color-muted);
+}
+.loading.hidden { display: none; }
+
+.spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---- Empty state ---- */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--color-muted);
+}
+.empty-icon { font-size: 4rem; margin-bottom: 1rem; }
+
+/* ---- Cards ---- */
+.card {
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--color-border);
+}
+
+.card-title {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    color: var(--color-primary);
+    margin-bottom: 1.25rem;
+    font-weight: 700;
+}
+
+/* ---- Report grid ---- */
+.report-grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+        "gauge summary"
+        "spectrum spectrum"
+        "bands processes"
+        "compare compare";
+}
+
+@media (max-width: 640px) {
+    .report-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "gauge"
+            "summary"
+            "spectrum"
+            "bands"
+            "processes"
+            "compare";
+    }
+}
+
+.card-gauge    { grid-area: gauge; }
+.card-summary  { grid-area: summary; }
+.card-spectrum { grid-area: spectrum; }
+.card-bands    { grid-area: bands; }
+.card-processes{ grid-area: processes; }
+.card-species-compare { grid-area: compare; }
+
+/* ---- Gauge ---- */
+.gauge-wrapper { display: flex; justify-content: center; margin-bottom: 1rem; }
+
+.gauge {
+    position: relative;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--gauge-color, #27ae60) 0deg calc(var(--score) * 3.6deg),
+        var(--color-border) calc(var(--score) * 3.6deg) 360deg
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Gauge color by score */
+.gauge { --gauge-color: #e74c3c; }
+.gauge[style*="--score: 4"], .gauge[style*="--score: 5"],
+.gauge[style*="--score: 6"] { --gauge-color: #e67e22; }
+.gauge[style*="--score: 7"] { --gauge-color: #f1c40f; }
+.gauge[style*="--score: 8"] { --gauge-color: #2ecc71; }
+.gauge[style*="--score: 9"], .gauge[style*="--score: 10"] { --gauge-color: #27ae60; }
+
+/* Fallback: usamos JS para setear el color */
+.gauge-inner {
+    position: absolute;
+    width: 120px; height: 120px;
+    background: var(--color-surface);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.gauge-value {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1;
+}
+.gauge-unit { font-size: 0.75rem; color: var(--color-muted); }
+.gauge-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-top: 0.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.species-badge {
+    text-align: center;
+    background: var(--color-surface-2);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem;
+}
+.species-badge .species-name { font-weight: 600; font-size: 0.95rem; display: block; }
+.species-badge .species-sci { font-style: italic; font-size: 0.8rem; color: var(--color-muted); }
+
+/* ---- Stats grid ---- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.stat {
+    background: var(--color-surface-2);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem;
+    text-align: center;
+}
+
+.stat-value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+}
+.stat-unit { font-size: 0.7rem; color: var(--color-muted); }
+.stat-label { display: block; font-size: 0.75rem; color: var(--color-muted); margin-top: 0.15rem; }
+.stat-category {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    margin-top: 0.25rem;
+    background: var(--color-surface);
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.solar-position {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    border-top: 1px solid var(--color-border);
+    padding-top: 0.75rem;
+}
+
+/* ---- Spectrum chart ---- */
+.spectrum-chart-wrapper {
+    position: relative;
+    height: 240px;
+    margin-bottom: 0.75rem;
+}
+
+.band-legend {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-size: 0.78rem;
+}
+
+.band-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.band-dot::before {
+    content: '';
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 2px;
+}
+.band-dot.band-uv::before      { background: var(--color-uv); }
+.band-dot.band-blue::before     { background: var(--color-blue); }
+.band-dot.band-green::before    { background: var(--color-green); }
+.band-dot.band-red::before      { background: var(--color-red); }
+.band-dot.band-far-red::before  { background: var(--color-far-red); }
+
+/* ---- Band bars ---- */
+.band-bars { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+
+.band-bar-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 40px;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.82rem;
+}
+
+.band-name { color: var(--color-muted); font-weight: 500; }
+.band-name.band-blue  { color: var(--color-blue); }
+.band-name.band-green { color: var(--color-green); }
+.band-name.band-red   { color: var(--color-red); }
+
+.band-bar-track {
+    height: 12px;
+    background: var(--color-surface-2);
+    border-radius: 6px;
+    overflow: hidden;
+}
+.band-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.6s ease;
+}
+.band-fill-blue  { background: var(--color-blue); }
+.band-fill-green { background: var(--color-green); }
+.band-fill-red   { background: var(--color-red); }
+
+.band-pct { font-size: 0.8rem; color: var(--color-muted); text-align: right; }
+
+.band-extras {
+    display: flex;
+    gap: 1rem;
+    border-top: 1px solid var(--color-border);
+    padding-top: 0.75rem;
+}
+.band-extra-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--color-muted);
+}
+
+/* ---- Physiological processes ---- */
+.processes-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.process-item {
+    background: var(--color-surface-2);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem;
+    border-left: 3px solid var(--color-border);
+}
+.process-item.process-red    { border-left-color: var(--color-red); }
+.process-item.process-blue   { border-left-color: var(--color-blue); }
+.process-item.process-green  { border-left-color: var(--color-green); }
+.process-item.process-far_red{ border-left-color: var(--color-far-red); }
+.process-item.process-uv_a   { border-left-color: var(--color-uv); }
+
+.process-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+}
+
+.process-band-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.process-band-dot.band-red     { background: var(--color-red); }
+.process-band-dot.band-blue    { background: var(--color-blue); }
+.process-band-dot.band-green   { background: var(--color-green); }
+.process-band-dot.band-far_red { background: var(--color-far-red); }
+.process-band-dot.band-uv_a    { background: var(--color-uv); }
+
+.process-band-name { font-weight: 600; font-size: 0.85rem; }
+
+.process-level-badge {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-left: auto;
+}
+.level-alto     { background: #d4edda; color: #1a5e2a; }
+.level-moderado { background: #fff3cd; color: #7a5a00; }
+.level-bajo     { background: #f1f1f1; color: var(--color-muted); }
+
+.process-list-items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.process-list-items li {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    padding-left: 0.75rem;
+    position: relative;
+}
+.process-list-items li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--color-primary-light);
+}
+
+/* ---- Species comparison ---- */
+.compare-recommendation {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+.recommendation-success { background: #d4edda; color: #1a5e2a; }
+.recommendation-warning { background: #fff3cd; color: #7a5a00; }
+.recommendation-danger  { background: #f8d7da; color: #7a1f1f; }
+.recommendation-info    { background: #d1ecf1; color: #0c5460; }
+
+.rec-icon { font-size: 1.2rem; }
+
+.compare-details { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+.compare-item { display: flex; gap: 0.5rem; align-items: baseline; font-size: 0.85rem; }
+.compare-label { font-weight: 600; color: var(--color-muted); min-width: 30px; }
+.compare-value { color: var(--color-text); }
+.compare-value.status-optimo      { color: var(--color-success); }
+.compare-value.status-insuficiente{ color: var(--color-danger); }
+.compare-value.status-exceso      { color: var(--color-danger); }
+
+.par-range-bar { margin-top: 0.5rem; }
+.par-range-track {
+    position: relative;
+    height: 8px;
+    background: var(--color-surface-2);
+    border-radius: 4px;
+    margin-bottom: 0.25rem;
+}
+.par-range-optimal {
+    position: absolute;
+    height: 100%;
+    background: #b8e0c0;
+    border-radius: 4px;
+}
+.par-current-marker {
+    position: absolute;
+    width: 14px; height: 14px;
+    background: var(--color-primary);
+    border: 2px solid white;
+    border-radius: 50%;
+    top: 50%; transform: translateY(-50%);
+    box-shadow: var(--shadow);
+    cursor: help;
+}
+.par-range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: var(--color-muted);
+}
+
+/* ---- Night card ---- */
+.night-card {
+    text-align: center;
+    padding: 3rem;
+}
+.night-icon { font-size: 4rem; margin-bottom: 1rem; }
+.night-card h2 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+}
+.night-card p { color: var(--color-muted); margin-bottom: 1.5rem; }
+.night-stats {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+.night-tip { font-size: 0.85rem; font-style: italic; }
+
+/* ---- Species search page ---- */
+.search-hero { text-align: center; padding: 2.5rem 1rem 1.5rem; }
+.search-hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    color: var(--color-primary);
+}
+.search-hero h1 em { font-style: italic; color: var(--color-accent); }
+
+.search-bar-wrapper {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+}
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+}
+.search-input {
+    width: 100%;
+    padding: 0.85rem 1rem 0.85rem 3rem;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+.search-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(45,90,39,0.1);
+}
+
+.search-placeholder { text-align: center; padding: 2rem; color: var(--color-muted); }
+
+/* ---- Species grid ---- */
+.species-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.25rem;
+}
+
+.species-card {
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+.species-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.species-card-body { padding: 1.25rem; flex: 1; }
+
+.species-light-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.badge-full_sun     { background: #fff3cd; color: #7a5a00; }
+.badge-partial_shade{ background: #d1ecf1; color: #0c5460; }
+.badge-full_shade   { background: #e8e8f0; color: #3a3a5c; }
+.badge-variable     { background: #d4edda; color: #1a5e2a; }
+
+.species-common-name {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    color: var(--color-text);
+    margin-bottom: 0.2rem;
+    font-weight: 700;
+}
+.species-sci-name { font-size: 0.82rem; color: var(--color-muted); margin-bottom: 0.5rem; }
+.species-family   { font-size: 0.78rem; color: var(--color-muted); margin-bottom: 0.75rem; }
+
+.species-par-info {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+.par-mini-stat { text-align: center; }
+.par-value { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; color: var(--color-primary); }
+.par-unit  { font-size: 0.65rem; color: var(--color-muted); display: block; }
+.par-label { font-size: 0.68rem; color: var(--color-muted); }
+
+.photoperiod-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    background: var(--color-surface-2);
+    color: var(--color-muted);
+}
+.badge-short_day { background: #e8d5f0; color: #5a2075; }
+.badge-long_day  { background: #ffecd5; color: #7a4500; }
+.badge-day_neutral { background: #e8f0e8; color: #2a5a2a; }
+
+.btn-species-detail {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--color-surface-2);
+    border: none;
+    border-top: 1px solid var(--color-border);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: background 0.2s;
+    text-align: center;
+}
+.btn-species-detail:hover { background: #eef5ec; }
+
+.no-results { text-align: center; padding: 2rem; color: var(--color-muted); grid-column: 1/-1; }
+
+/* ---- Modal ---- */
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+.modal.hidden { display: none; }
+
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    position: relative;
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 880px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    width: 32px; height: 32px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--color-muted);
+    transition: background 0.2s;
+}
+.modal-close:hover { background: var(--color-border); }
+
+/* ---- Footer ---- */
+.site-footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-muted);
+    font-size: 0.82rem;
+    border-top: 1px solid var(--color-border);
+    margin-top: 4rem;
+}
+
+/* ---- Utility ---- */
+.hidden { display: none !important; }
+.muted  { color: var(--color-muted); font-size: 0.9rem; }

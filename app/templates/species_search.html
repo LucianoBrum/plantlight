@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}PlantLight — Buscador de Especies{% endblock %}
+
+{% block content %}
+<section class="search-hero">
+    <h1>Buscador de <em>Especies</em></h1>
+    <p class="subtitle">Encontrá los requerimientos de luz de tu planta y compará con tu ubicación actual.</p>
+</section>
+
+<div class="search-bar-wrapper">
+    <span class="search-icon">🔍</span>
+    <input
+        id="species-search-input"
+        type="text"
+        name="q"
+        placeholder="Buscá por nombre común o científico… (ej: tomate, Lactuca)"
+        class="search-input"
+        autocomplete="off"
+        hx-get="/api/species/search"
+        hx-trigger="keyup changed delay:300ms"
+        hx-target="#species-results"
+        hx-include="this"
+        hx-headers='{"Accept": "text/html"}'
+    >
+</div>
+
+<div id="species-results" class="species-grid">
+    <!-- Los resultados se cargan aquí vía HTMX -->
+    <div class="search-placeholder">
+        <p>Escribí para buscar especies…</p>
+    </div>
+</div>
+
+<!-- Modal de detalle de especie -->
+<div id="species-modal" class="modal hidden">
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-content">
+        <button class="modal-close" id="modal-close">✕</button>
+        <div id="modal-body"></div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}PlantLight — Calidad de luz solar para tus plantas{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-text">
+        <h1>¿Cuánta luz solar<br><em>tienen tus plantas</em> hoy?</h1>
+        <p class="subtitle">Analizamos la calidad de la luz solar en tu ubicación en tiempo real: espectro, PAR, DLI y más.</p>
+    </div>
+    <div class="hero-actions">
+        <button id="btn-geolocate" class="btn-primary">
+            <span class="btn-icon">📍</span> Detectar mi ubicación
+        </button>
+        <p class="hero-hint">o ingresá una fecha y hora para simular</p>
+        <div class="datetime-picker">
+            <input type="datetime-local" id="input-datetime" />
+            <button id="btn-datetime" class="btn-secondary">Calcular</button>
+        </div>
+    </div>
+</section>
+
+<div id="loading" class="loading hidden">
+    <div class="spinner"></div>
+    <p>Calculando la luz solar…</p>
+</div>
+
+<div id="light-report-container">
+    <!-- El reporte de luz se carga aquí vía JS/HTMX -->
+    <div class="empty-state">
+        <div class="empty-icon">🌤️</div>
+        <p>Presioná <strong>"Detectar mi ubicación"</strong> para ver el análisis de luz solar en tu posición actual.</p>
+    </div>
+</div>
+{% endblock %}
