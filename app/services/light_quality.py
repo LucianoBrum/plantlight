@@ -346,6 +346,7 @@ def build_light_report(metrics: dict, species: Optional[dict] = None) -> dict:
         "solar_position": metrics.get("solar_position", {}),
         "airmass": metrics.get("airmass"),
         "spectrum": metrics.get("spectrum", {"wavelengths": [], "irradiance": []}),
+        "daily_par_chart": metrics.get("daily_par_chart", {"hours": [], "par_umol": [], "current_hour": 0}),
         "species_comparison": None,
     }
 

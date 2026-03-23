@@ -7,6 +7,7 @@
 let currentLat = -34.6;   // Buenos Aires por defecto
 let currentLon = -58.4;
 let spectrumChart = null;
+let dailyChart = null;
 
 // ─── Inicialización ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -84,6 +85,7 @@ async function fetchReport(lat, lon, dt = null, _label = null) {
         if (container) {
             container.innerHTML = html;
             initSpectrumChart();
+            initDailyChart();
             initGaugeColor();
         }
     } catch (err) {
@@ -121,6 +123,7 @@ async function openSpeciesDetail(speciesId) {
         const html = await res.text();
         body.innerHTML = html;
         initSpectrumChartIn(body);
+        initDailyChartIn(body);
         initGaugeColorIn(body);
     } catch {
         body.innerHTML = '<p style="color:#b84040;padding:2rem">Error al cargar el análisis.</p>';
@@ -137,10 +140,8 @@ function closeModal() {
     const modal = document.getElementById('species-modal');
     modal?.classList.add('hidden');
     // Destruir chart del modal si existe
-    if (window._modalChart) {
-        window._modalChart.destroy();
-        window._modalChart = null;
-    }
+    if (window._modalChart) { window._modalChart.destroy(); window._modalChart = null; }
+    if (window._modalDailyChart) { window._modalDailyChart.destroy(); window._modalDailyChart = null; }
 }
 
 // ─── Inicializar Chart.js ────────────────────────────────────────────────
@@ -260,6 +261,112 @@ function initSpectrumChartIn(root) {
     }
 }
 
+// ─── Gráfico diario de PAR ───────────────────────────────────────────────
+function initDailyChart() { initDailyChartIn(document); }
+
+function initDailyChartIn(root) {
+    const canvas = root.querySelector('#daily-par-chart');
+    if (!canvas) return;
+
+    if (dailyChart) { dailyChart.destroy(); dailyChart = null; }
+
+    let hours, parValues, currentHour;
+    try {
+        hours       = JSON.parse(canvas.dataset.hours);
+        parValues   = JSON.parse(canvas.dataset.par);
+        currentHour = parseInt(canvas.dataset.currentHour);
+    } catch { return; }
+
+    // Etiquetas de hora en formato "6h", "12h", etc.
+    const labels = hours.map(h => `${h}h`);
+
+    // Punto actual resaltado
+    const pointColors = hours.map(h =>
+        h === currentHour ? '#2d5a27' : 'transparent'
+    );
+    const pointRadius = hours.map(h => h === currentHour ? 6 : 0);
+
+    const ctx = canvas.getContext('2d');
+
+    // Gradiente vertical: verde arriba, claro abajo
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.offsetHeight || 200);
+    gradient.addColorStop(0,   'rgba(45, 90, 39, 0.35)');
+    gradient.addColorStop(1,   'rgba(45, 90, 39, 0.02)');
+
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'PAR (µmol/m²/s)',
+                data: parValues,
+                borderColor: '#2d5a27',
+                backgroundColor: gradient,
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius,
+                pointBackgroundColor: pointColors,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: (items) => `${items[0].label}`,
+                        label: (item)  => `PAR: ${item.raw.toFixed(0)} µmol/m²/s`,
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: '#6b6452',
+                        font: { size: 10 },
+                        maxTicksLimit: 13,
+                    },
+                    grid: { color: 'rgba(0,0,0,0.04)' },
+                },
+                y: {
+                    title: { display: true, text: 'µmol/m²/s', color: '#6b6452', font: { size: 11 } },
+                    ticks: { color: '#6b6452', font: { size: 10 } },
+                    grid: { color: 'rgba(0,0,0,0.04)' },
+                    beginAtZero: true,
+                }
+            },
+        },
+        plugins: [{
+            // Línea vertical en la hora actual
+            afterDraw(chart) {
+                const { ctx, scales: { x, y } } = chart;
+                const idx = hours.indexOf(currentHour);
+                if (idx < 0) return;
+                const xPos = x.getPixelForValue(idx);
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(xPos, y.top);
+                ctx.lineTo(xPos, y.bottom);
+                ctx.strokeStyle = 'rgba(45,90,39,0.5)';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 3]);
+                ctx.stroke();
+                ctx.restore();
+            }
+        }]
+    });
+
+    if (root === document) {
+        dailyChart = chart;
+    } else {
+        window._modalDailyChart = chart;
+    }
+}
+
 // ─── Color del gauge según score ────────────────────────────────────────
 function initGaugeColor() { initGaugeColorIn(document); }
 
@@ -290,4 +397,5 @@ function clearReport() {
     const container = document.getElementById('light-report-container');
     if (container) container.innerHTML = '';
     if (spectrumChart) { spectrumChart.destroy(); spectrumChart = null; }
+    if (dailyChart)    { dailyChart.destroy();    dailyChart = null;    }
 }

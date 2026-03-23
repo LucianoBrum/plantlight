@@ -172,11 +172,20 @@ def get_light_metrics(lat: float, lon: float, dt: Optional[datetime] = None) -> 
         sun_positions = location.get_solarposition(times_day)
         daylight_hours = float((sun_positions["elevation"] > 0).sum())
 
+        clearsky_night = location.get_clearsky(times_day)
+        par_umol_night = clearsky_night["ghi"].values * 0.45 * 4.57
+        current_hour_night = int(pd.Timestamp(dt_calc).hour)
+
         return {
             "sun_is_up": False,
             "par_umol": 0.0,
             "dli_estimated": 0.0,
             "daylight_hours": daylight_hours,
+            "daily_par_chart": {
+                "hours": list(range(24)),
+                "par_umol": [round(float(v), 1) for v in par_umol_night],
+                "current_hour": current_hour_night,
+            },
             "bands_w_m2": {k: 0.0 for k in ["uv_a", "blue", "green", "red", "far_red", "par"]},
             "bands_percent": {k: 0.0 for k in ["uv_a", "blue", "green", "red", "far_red"]},
             "r_fr_ratio": None,
@@ -214,6 +223,14 @@ def get_light_metrics(lat: float, lon: float, dt: Optional[datetime] = None) -> 
     par_umol_hourly = par_w_hourly * 4.57
     dli = float((par_umol_hourly * 3600 / 1_000_000).sum())
 
+    # Historial diario: PAR hora a hora para el gráfico de evolución del día
+    current_hour = int(pd.Timestamp(dt_calc).hour)
+    daily_par_chart = {
+        "hours": list(range(24)),
+        "par_umol": [round(float(v), 1) for v in par_umol_hourly],
+        "current_hour": current_hour,
+    }
+
     # Porcentajes respecto al total PAR
     total_par_bands = blue_w + green_w + red_w  # solo 400-700nm
     def pct(val: float) -> float:
@@ -243,6 +260,7 @@ def get_light_metrics(lat: float, lon: float, dt: Optional[datetime] = None) -> 
         "airmass": spectrum["airmass"],
         "solar_position": spectrum["solar_position"],
         "daylight_hours": daylight_hours,
+        "daily_par_chart": daily_par_chart,
         "spectrum": {
             "wavelengths": spectrum["wavelengths"],
             "irradiance": spectrum["irradiance"],

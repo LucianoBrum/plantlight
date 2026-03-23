@@ -212,6 +212,7 @@ input[type="datetime-local"]:focus { outline: none; border-color: var(--color-pr
         "gauge summary"
         "spectrum spectrum"
         "bands processes"
+        "daily daily"
         "compare compare";
 }
 
@@ -224,15 +225,17 @@ input[type="datetime-local"]:focus { outline: none; border-color: var(--color-pr
             "spectrum"
             "bands"
             "processes"
+            "daily"
             "compare";
     }
 }
 
-.card-gauge    { grid-area: gauge; }
-.card-summary  { grid-area: summary; }
-.card-spectrum { grid-area: spectrum; }
-.card-bands    { grid-area: bands; }
-.card-processes{ grid-area: processes; }
+.card-gauge        { grid-area: gauge; }
+.card-summary      { grid-area: summary; }
+.card-spectrum     { grid-area: spectrum; }
+.card-bands        { grid-area: bands; }
+.card-processes    { grid-area: processes; }
+.card-daily-chart  { grid-area: daily; }
 .card-species-compare { grid-area: compare; }
 
 /* ---- Gauge ---- */
@@ -753,6 +756,19 @@ input[type="datetime-local"]:focus { outline: none; border-color: var(--color-pr
     font-size: 0.82rem;
     border-top: 1px solid var(--color-border);
     margin-top: 4rem;
+}
+
+/* ---- Daily PAR chart ---- */
+.daily-chart-wrapper {
+    position: relative;
+    height: 200px;
+    margin-bottom: 0.5rem;
+}
+.daily-chart-caption {
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    text-align: center;
+    font-style: italic;
 }
 
 /* ---- Utility ---- */

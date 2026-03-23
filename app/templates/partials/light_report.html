@@ -137,6 +137,19 @@
         {% endif %}
     </div>
 
+    <!-- Historial del día -->
+    <div class="card card-daily-chart">
+        <h3 class="card-title">Evolución del PAR durante el día</h3>
+        <div class="daily-chart-wrapper">
+            <canvas id="daily-par-chart"
+                data-hours="{{ report.daily_par_chart.hours | tojson }}"
+                data-par="{{ report.daily_par_chart.par_umol | tojson }}"
+                data-current-hour="{{ report.daily_par_chart.current_hour }}">
+            </canvas>
+        </div>
+        <p class="daily-chart-caption">Radiación fotosintéticamente activa estimada (µmol/m²/s) hora a hora. La línea vertical marca el momento actual.</p>
+    </div>
+
     <!-- Comparación con especie (si aplica) -->
     {% if report.species_comparison %}
     {% set comp = report.species_comparison %}
