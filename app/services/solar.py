@@ -161,15 +161,28 @@ def get_light_metrics(lat: float, lon: float, dt: Optional[datetime] = None) -> 
     irr = np.array(spectrum["irradiance"])
 
     if not spectrum["sun_is_up"]:
+        # Igual calculamos horas de luz del día para mostrar en el reporte nocturno
+        location = pvlib.location.Location(latitude=lat, longitude=lon)
+        if dt is None:
+            dt_calc = datetime.now(timezone.utc)
+        else:
+            dt_calc = dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+        day_start = pd.Timestamp(dt_calc).normalize().tz_localize(None)
+        times_day = pd.date_range(start=day_start, periods=24, freq="1h", tz="UTC")
+        sun_positions = location.get_solarposition(times_day)
+        daylight_hours = float((sun_positions["elevation"] > 0).sum())
+
         return {
             "sun_is_up": False,
             "par_umol": 0.0,
             "dli_estimated": 0.0,
+            "daylight_hours": daylight_hours,
             "bands_w_m2": {k: 0.0 for k in ["uv_a", "blue", "green", "red", "far_red", "par"]},
             "bands_percent": {k: 0.0 for k in ["uv_a", "blue", "green", "red", "far_red"]},
             "r_fr_ratio": None,
             "airmass": None,
             "solar_position": spectrum["solar_position"],
+            "spectrum": {"wavelengths": spectrum["wavelengths"], "irradiance": spectrum["irradiance"]},
         }
 
     # Integrar bandas

@@ -345,6 +345,7 @@ def build_light_report(metrics: dict, species: Optional[dict] = None) -> dict:
         "active_processes": processes,
         "solar_position": metrics.get("solar_position", {}),
         "airmass": metrics.get("airmass"),
+        "spectrum": metrics.get("spectrum", {"wavelengths": [], "irradiance": []}),
         "species_comparison": None,
     }
 
