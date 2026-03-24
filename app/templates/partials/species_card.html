@@ -1,6 +1,6 @@
 {% if species_list %}
 {% for sp in species_list %}
-<div class="species-card" data-species-id="{{ sp.id }}">
+<div class="species-card" data-species-id="{{ sp.id }}" data-species-name="{{ sp.common_name }}">
     <div class="species-card-body">
         <div class="species-light-badge badge-{{ sp.light_requirement }}">
             {% if sp.light_requirement == 'full_sun' %}☀️ Sol pleno
@@ -33,9 +33,14 @@
         </div>
         {% endif %}
     </div>
-    <button class="btn-species-detail" onclick="openSpeciesDetail({{ sp.id }})">
-        Ver análisis de luz →
-    </button>
+    <div class="species-card-actions">
+        <button class="btn-species-detail" onclick="openSpeciesDetail({{ sp.id }})">
+            Ver análisis →
+        </button>
+        <button class="btn-species-select hidden" onclick="selectForCompare({{ sp.id }}, '{{ sp.common_name }}')">
+            + Seleccionar
+        </button>
+    </div>
 </div>
 {% endfor %}
 {% else %}

@@ -5,7 +5,7 @@ Router de endpoints de búsqueda y detalle de especies.
 from fastapi import APIRouter, HTTPException, Request, Query
 from fastapi.responses import JSONResponse
 
-from app.models.schemas import SpeciesLightRequest
+from app.models.schemas import SpeciesLightRequest, SpeciesCompareRequest
 from app.services import solar, light_quality, species_db
 from app.template_engine import templates
 
@@ -26,6 +26,34 @@ async def search(request: Request, q: str = Query(default="")):
             request, "partials/species_card.html", {"species_list": results},
         )
     return JSONResponse(content=results)
+
+
+@router.post("/compare")
+async def compare_species(payload: SpeciesCompareRequest, request: Request):
+    """
+    Compara dos especies lado a lado para una misma ubicación.
+    Debe estar antes de /{species_id} para que Starlette no lo capture primero.
+    """
+    sp1 = await species_db.get_species_by_id(payload.species_id_1)
+    sp2 = await species_db.get_species_by_id(payload.species_id_2)
+    if sp1 is None or sp2 is None:
+        raise HTTPException(status_code=404, detail="Especie no encontrada")
+
+    metrics = solar.get_light_metrics(lat=payload.lat, lon=payload.lon)
+    comp1 = light_quality.compare_with_species(metrics, sp1)
+    comp2 = light_quality.compare_with_species(metrics, sp2)
+
+    context = {
+        "metrics": metrics,
+        "species1": sp1,
+        "species2": sp2,
+        "comp1": comp1,
+        "comp2": comp2,
+    }
+
+    if "text/html" in request.headers.get("accept", ""):
+        return templates.TemplateResponse(request, "partials/species_compare.html", context)
+    return JSONResponse(content=context)
 
 
 @router.get("/{species_id}")

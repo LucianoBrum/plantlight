@@ -467,6 +467,140 @@ function initGaugeColorIn(root) {
     gauge.style.setProperty('--gauge-color', color);
 }
 
+// ─── Modo comparación de especies ────────────────────────────────────────
+let compareMode = false;
+let compareSlots = [null, null]; // [{id, name}, {id, name}]
+
+function toggleCompareMode() {
+    compareMode = !compareMode;
+    const btn = document.getElementById('btn-compare-mode');
+    const panel = document.getElementById('compare-panel');
+
+    if (compareMode) {
+        btn.classList.add('active');
+        btn.textContent = '✕ Cancelar comparación';
+        panel.classList.remove('hidden');
+    } else {
+        compareMode = false;
+        compareSlots = [null, null];
+        btn.classList.remove('active');
+        btn.textContent = '⚖️ Comparar especies';
+        panel.classList.add('hidden');
+        clearCompareSlot(1);
+        clearCompareSlot(2);
+    }
+
+    // Alternar botones en las cards ya cargadas
+    document.querySelectorAll('.btn-species-detail').forEach(b => b.classList.toggle('hidden', compareMode));
+    document.querySelectorAll('.btn-species-select').forEach(b => b.classList.toggle('hidden', !compareMode));
+}
+
+function selectForCompare(id, name) {
+    // Si ya está seleccionada, no hacer nada
+    if (compareSlots.some(s => s && s.id === id)) return;
+
+    const slot = compareSlots[0] === null ? 0 : (compareSlots[1] === null ? 1 : -1);
+    if (slot === -1) return; // ya hay 2
+
+    compareSlots[slot] = { id, name };
+
+    const nameEl = document.getElementById(`compare-name-${slot + 1}`);
+    const clearBtn = document.getElementById(`compare-clear-${slot + 1}`);
+    const slotEl = document.getElementById(`compare-slot-${slot + 1}`);
+
+    if (nameEl) nameEl.textContent = name;
+    if (clearBtn) clearBtn.classList.remove('hidden');
+    if (slotEl) slotEl.classList.add('filled');
+
+    // Marcar la card como seleccionada
+    document.querySelectorAll('.species-card').forEach(card => {
+        if (parseInt(card.dataset.speciesId) === id) {
+            card.classList.add('compare-selected');
+            card.querySelector('.btn-species-select').textContent = '✓ Seleccionada';
+            card.querySelector('.btn-species-select').disabled = true;
+        }
+    });
+
+    // Mostrar botón comparar si hay 2
+    const runBtn = document.getElementById('btn-run-compare');
+    if (compareSlots[0] && compareSlots[1] && runBtn) {
+        runBtn.classList.remove('hidden');
+    }
+}
+
+function clearCompareSlot(num) {
+    const idx = num - 1;
+    const prev = compareSlots[idx];
+    compareSlots[idx] = null;
+
+    const nameEl = document.getElementById(`compare-name-${num}`);
+    const clearBtn = document.getElementById(`compare-clear-${num}`);
+    const slotEl = document.getElementById(`compare-slot-${num}`);
+
+    if (nameEl) nameEl.textContent = '—';
+    if (clearBtn) clearBtn.classList.add('hidden');
+    if (slotEl) slotEl.classList.remove('filled');
+
+    // Desmarcar la card
+    if (prev) {
+        document.querySelectorAll('.species-card').forEach(card => {
+            if (parseInt(card.dataset.speciesId) === prev.id) {
+                card.classList.remove('compare-selected');
+                const btn = card.querySelector('.btn-species-select');
+                if (btn) { btn.textContent = '+ Seleccionar'; btn.disabled = false; }
+            }
+        });
+    }
+
+    document.getElementById('btn-run-compare')?.classList.add('hidden');
+}
+
+async function runComparison() {
+    if (!compareSlots[0] || !compareSlots[1]) return;
+
+    const modal = document.getElementById('species-modal');
+    const body = document.getElementById('modal-body');
+    if (!modal || !body) return;
+
+    modal.classList.remove('hidden');
+    body.innerHTML = '<div class="loading"><div class="spinner"></div><p>Comparando especies…</p></div>';
+
+    try {
+        const res = await fetch('/api/species/compare', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'text/html' },
+            body: JSON.stringify({
+                lat: currentLat,
+                lon: currentLon,
+                species_id_1: compareSlots[0].id,
+                species_id_2: compareSlots[1].id,
+            }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        body.innerHTML = await res.text();
+    } catch {
+        body.innerHTML = '<p style="color:#b84040;padding:2rem">Error al comparar las especies.</p>';
+    }
+}
+
+// Al cargar nuevas cards, sincronizar visibilidad de botones
+document.addEventListener('htmx:afterSwap', (e) => {
+    if (!e.target || e.target.id !== 'species-results') return;
+    document.querySelectorAll('.btn-species-detail').forEach(b => b.classList.toggle('hidden', compareMode));
+    document.querySelectorAll('.btn-species-select').forEach(b => b.classList.toggle('hidden', !compareMode));
+    // Re-marcar cards ya seleccionadas
+    compareSlots.forEach(slot => {
+        if (!slot) return;
+        document.querySelectorAll('.species-card').forEach(card => {
+            if (parseInt(card.dataset.speciesId) === slot.id) {
+                card.classList.add('compare-selected');
+                const btn = card.querySelector('.btn-species-select');
+                if (btn) { btn.textContent = '✓ Seleccionada'; btn.disabled = true; }
+            }
+        });
+    });
+});
+
 // ─── Helpers UI ──────────────────────────────────────────────────────────
 function showLoading(show) {
     const el = document.getElementById('loading');
