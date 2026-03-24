@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Response
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
@@ -26,13 +26,14 @@ async def species_page(request: Request):
 
 
 @app.post("/set-lang")
-async def set_lang(request: Request, response: Response):
+async def set_lang(request: Request):
     body = await request.json()
     lang = body.get("lang", "es")
     if lang not in ("es", "en"):
         lang = "es"
-    response.set_cookie("lang", lang, max_age=60 * 60 * 24 * 365, samesite="lax")
-    return JSONResponse({"ok": True})
+    resp = JSONResponse({"ok": True})
+    resp.set_cookie("lang", lang, max_age=60 * 60 * 24 * 365, samesite="lax")
+    return resp
 
 
 @app.get("/api/health")
