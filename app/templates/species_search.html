@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}PlantLight — Buscador de Especies{% endblock %}
+{% block title %}PlantLight — {{ t('nav.species', lang or 'es') }}{% endblock %}
 
 {% block content %}
 <section class="search-hero">
-    <h1>Buscador de <em>Especies</em></h1>
-    <p class="subtitle">Encontrá los requerimientos de luz de tu planta y compará con tu ubicación actual.</p>
+    <h1>{{ t('species.hero_title', lang or 'es') | safe }}</h1>
+    <p class="subtitle">{{ t('species.hero_subtitle', lang or 'es') }}</p>
 </section>
 
 <div class="search-bar-wrapper">
@@ -14,7 +14,7 @@
         id="species-search-input"
         type="text"
         name="q"
-        placeholder="Buscá por nombre común o científico… (ej: tomate, Lactuca)"
+        placeholder="{{ t('species.placeholder', lang or 'es') }}"
         class="search-input"
         autocomplete="off"
         hx-get="/api/species/search"
@@ -24,33 +24,33 @@
         hx-headers='{"Accept": "text/html"}'
     >
     <button id="btn-compare-mode" class="btn-secondary btn-compare-toggle" onclick="toggleCompareMode()">
-        ⚖️ Comparar especies
+        ⚖️ {{ t('species.compare_btn', lang or 'es') }}
     </button>
 </div>
 
-<!-- Panel de comparación (oculto hasta activar modo) -->
+<!-- Panel de comparación -->
 <div id="compare-panel" class="compare-panel hidden">
     <div class="compare-panel-slots">
         <div class="compare-slot" id="compare-slot-1">
-            <span class="compare-slot-label">Especie 1</span>
+            <span class="compare-slot-label">{{ t('compare.slot1', lang or 'es') }}</span>
             <span class="compare-slot-name" id="compare-name-1">—</span>
             <button class="compare-slot-clear hidden" id="compare-clear-1" onclick="clearCompareSlot(1)">✕</button>
         </div>
-        <div class="compare-vs">VS</div>
+        <div class="compare-vs">{{ t('compare.vs', lang or 'es') }}</div>
         <div class="compare-slot" id="compare-slot-2">
-            <span class="compare-slot-label">Especie 2</span>
+            <span class="compare-slot-label">{{ t('compare.slot2', lang or 'es') }}</span>
             <span class="compare-slot-name" id="compare-name-2">—</span>
             <button class="compare-slot-clear hidden" id="compare-clear-2" onclick="clearCompareSlot(2)">✕</button>
         </div>
     </div>
     <button id="btn-run-compare" class="btn-primary hidden" onclick="runComparison()">
-        Ver comparación →
+        {{ t('compare.run_btn', lang or 'es') }}
     </button>
 </div>
 
 <div id="species-results" class="species-grid">
     <div class="search-placeholder">
-        <p>Escribí para buscar especies…</p>
+        <p>{{ t('species.placeholder_empty', lang or 'es') }}</p>
     </div>
 </div>
 

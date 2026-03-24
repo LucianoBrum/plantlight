@@ -1,3 +1,4 @@
+{% set _lang = lang or 'es' %}
 {% if report.sun_is_up %}
 <div class="report-grid">
 
@@ -8,7 +9,8 @@
                 <div class="gauge-inner">
                     <span class="gauge-value">{{ report.quality.total }}</span>
                     <span class="gauge-unit">/100</span>
-                    <span class="gauge-label">{{ report.quality.label }}</span>
+                    {% set _qlabels = {'Sin luz solar': 'quality.no_sun', 'Muy deficiente': 'quality.very_poor', 'Deficiente': 'quality.poor', 'Moderada': 'quality.moderate', 'Buena': 'quality.good', 'Excelente': 'quality.excellent'} %}
+                    <span class="gauge-label">{{ t(_qlabels.get(report.quality.label, report.quality.label), _lang) }}</span>
                 </div>
             </div>
         </div>
@@ -22,48 +24,48 @@
 
     <!-- Resumen del día -->
     <div class="card card-summary">
-        <h3 class="card-title">Resumen del día</h3>
+        <h3 class="card-title">{{ t('report.day_summary', _lang) }}</h3>
         <div class="stats-grid">
             <div class="stat">
                 <span class="stat-value">{{ report.par_umol | round(0) | int }}</span>
                 <span class="stat-unit">µmol/m²/s</span>
-                <span class="stat-label">PAR actual</span>
+                <span class="stat-label">{{ t('report.par_current', _lang) }}</span>
                 <span class="stat-category {{ report.par_classification | replace(' ', '-') }}">{{ report.par_classification }}</span>
             </div>
             <div class="stat">
                 <span class="stat-value">{{ report.dli_estimated | round(1) }}</span>
-                <span class="stat-unit">mol/m²/día</span>
-                <span class="stat-label">DLI estimado</span>
+                <span class="stat-unit">{{ t('report.dli_unit', _lang) }}</span>
+                <span class="stat-label">{{ t('report.dli_estimated', _lang) }}</span>
                 <span class="stat-category">{{ report.dli_classification }}</span>
             </div>
             <div class="stat">
                 <span class="stat-value">{{ report.daylight_hours | round(0) | int }}</span>
-                <span class="stat-unit">horas</span>
-                <span class="stat-label">Horas de luz</span>
+                <span class="stat-unit">{{ 'h' }}</span>
+                <span class="stat-label">{{ t('report.daylight_hours', _lang) }}</span>
             </div>
             <div class="stat">
                 {% if report.r_fr_ratio %}
                 <span class="stat-value">{{ report.r_fr_ratio }}</span>
                 <span class="stat-unit">R:FR</span>
-                <span class="stat-label">Ratio rojo/lejano</span>
+                <span class="stat-label">{{ t('report.r_fr_ratio', _lang) }}</span>
                 {% else %}
                 <span class="stat-value">—</span>
-                <span class="stat-label">Ratio R:FR</span>
+                <span class="stat-label">{{ t('report.r_fr_ratio', _lang) }}</span>
                 {% endif %}
             </div>
         </div>
         <div class="solar-position">
-            <span>☀️ Elevación: <strong>{{ report.solar_position.elevation | round(1) }}°</strong></span>
-            <span>Azimut: <strong>{{ report.solar_position.azimuth | round(0) | int }}°</strong></span>
+            <span>☀️ {{ t('report.elevation', _lang) }}: <strong>{{ report.solar_position.elevation | round(1) }}°</strong></span>
+            <span>{{ t('report.azimuth', _lang) }}: <strong>{{ report.solar_position.azimuth | round(0) | int }}°</strong></span>
             {% if report.airmass %}
-            <span>Masa de aire: <strong>{{ report.airmass | round(2) }}</strong></span>
+            <span>{{ t('report.airmass', _lang) }}: <strong>{{ report.airmass | round(2) }}</strong></span>
             {% endif %}
         </div>
     </div>
 
     <!-- Espectro solar -->
     <div class="card card-spectrum">
-        <h3 class="card-title">Espectro solar</h3>
+        <h3 class="card-title">{{ t('report.solar_spectrum', _lang) }}</h3>
         <div class="spectrum-chart-wrapper">
             <canvas id="spectrum-chart"
                 data-wavelengths="{{ report.spectrum.wavelengths | tojson }}"
@@ -71,24 +73,24 @@
             </canvas>
         </div>
         <div class="band-legend">
-            <span class="band-dot band-uv">UV-A</span>
-            <span class="band-dot band-blue">Azul</span>
-            <span class="band-dot band-green">Verde</span>
-            <span class="band-dot band-red">Rojo</span>
-            <span class="band-dot band-far-red">Rojo lejano</span>
+            <span class="band-dot band-uv">{{ t('band.uv_a', _lang) }}</span>
+            <span class="band-dot band-blue">{{ t('band.blue', _lang) }}</span>
+            <span class="band-dot band-green">{{ t('band.green', _lang) }}</span>
+            <span class="band-dot band-red">{{ t('band.red', _lang) }}</span>
+            <span class="band-dot band-far-red">{{ t('band.far_red', _lang) }}</span>
         </div>
     </div>
 
     <!-- Desglose espectral -->
     <div class="card card-bands">
-        <h3 class="card-title">Distribución espectral (PAR)</h3>
+        <h3 class="card-title">{{ t('report.spectral_dist', _lang) }}</h3>
         <div class="band-bars">
             {% for band, pct in report.bands_percent.items() %}
             <div class="band-bar-row">
                 <span class="band-name band-{{ band }}">
-                    {% if band == 'blue' %}Azul (400–500 nm)
-                    {% elif band == 'green' %}Verde (500–600 nm)
-                    {% elif band == 'red' %}Rojo (600–700 nm)
+                    {% if band == 'blue' %}{{ t('band.blue_nm', _lang) }}
+                    {% elif band == 'green' %}{{ t('band.green_nm', _lang) }}
+                    {% elif band == 'red' %}{{ t('band.red_nm', _lang) }}
                     {% endif %}
                 </span>
                 <div class="band-bar-track">
@@ -100,11 +102,11 @@
         </div>
         <div class="band-extras">
             <div class="band-extra-item">
-                <span class="band-dot band-uv">UV-A</span>
+                <span class="band-dot band-uv">{{ t('band.uv_a', _lang) }}</span>
                 <span>{{ report.bands_w_m2.uv_a | round(1) }} W/m²</span>
             </div>
             <div class="band-extra-item">
-                <span class="band-dot band-far-red">Rojo lejano</span>
+                <span class="band-dot band-far-red">{{ t('band.far_red', _lang) }}</span>
                 <span>{{ report.bands_w_m2.far_red | round(1) }} W/m²</span>
             </div>
         </div>
@@ -112,7 +114,7 @@
 
     <!-- Procesos fisiológicos -->
     <div class="card card-processes">
-        <h3 class="card-title">Procesos fisiológicos activos</h3>
+        <h3 class="card-title">{{ t('report.phys_processes', _lang) }}</h3>
         {% if report.active_processes %}
         <div class="processes-list">
             {% for proc in report.active_processes %}
@@ -120,9 +122,14 @@
                 <div class="process-header">
                     <span class="process-band-dot band-{{ proc.band }}"></span>
                     <span class="process-band-name">
-                        {% if proc.band == 'red' %}Rojo{% elif proc.band == 'blue' %}Azul{% elif proc.band == 'green' %}Verde{% elif proc.band == 'far_red' %}Rojo lejano{% elif proc.band == 'uv_a' %}UV-A{% endif %}
+                        {% if proc.band == 'red' %}{{ t('band.red', _lang) }}
+                        {% elif proc.band == 'blue' %}{{ t('band.blue', _lang) }}
+                        {% elif proc.band == 'green' %}{{ t('band.green', _lang) }}
+                        {% elif proc.band == 'far_red' %}{{ t('band.far_red', _lang) }}
+                        {% elif proc.band == 'uv_a' %}{{ t('band.uv_a', _lang) }}
+                        {% endif %}
                     </span>
-                    <span class="process-level-badge level-{{ proc.level }}">{{ proc.level }}</span>
+                    <span class="process-level-badge level-{{ proc.level }}">{{ t('level.' + proc.level, _lang) }}</span>
                 </div>
                 <ul class="process-list-items">
                     {% for p in proc.processes %}
@@ -133,13 +140,13 @@
             {% endfor %}
         </div>
         {% else %}
-        <p class="muted">No hay procesos activos detectados.</p>
+        <p class="muted">{{ t('report.no_processes', _lang) }}</p>
         {% endif %}
     </div>
 
     <!-- Historial del día -->
     <div class="card card-daily-chart">
-        <h3 class="card-title">Evolución del PAR durante el día</h3>
+        <h3 class="card-title">{{ t('report.par_evolution', _lang) }}</h3>
         <div class="daily-chart-wrapper">
             <canvas id="daily-par-chart"
                 data-hours="{{ report.daily_par_chart.hours | tojson }}"
@@ -147,14 +154,14 @@
                 data-current-hour="{{ report.daily_par_chart.current_hour }}">
             </canvas>
         </div>
-        <p class="daily-chart-caption">Radiación fotosintéticamente activa estimada (µmol/m²/s) hora a hora. La línea vertical marca el momento actual.</p>
+        <p class="daily-chart-caption">{{ t('report.par_caption', _lang) }}</p>
     </div>
 
     <!-- Comparación con especie (si aplica) -->
     {% if report.species_comparison %}
     {% set comp = report.species_comparison %}
     <div class="card card-species-compare level-{{ comp.recommendation_level }}">
-        <h3 class="card-title">Comparación con la especie</h3>
+        <h3 class="card-title">{{ t('report.species_compare', _lang) }}</h3>
         <div class="compare-recommendation recommendation-{{ comp.recommendation_level }}">
             <span class="rec-icon">
                 {% if comp.recommendation_level == 'success' %}✅
@@ -183,12 +190,12 @@
                 </div>
                 {% set par_pos = [comp.current_par / comp.species_par_max * 100, 100] | min %}
                 <div class="par-current-marker" style="left: {{ par_pos }}%"
-                     title="Actual: {{ comp.current_par | round(0) | int }} µmol/m²/s"></div>
+                     title="{{ t('compare.current', _lang) }} {{ comp.current_par | round(0) | int }} µmol/m²/s"></div>
             </div>
             <div class="par-range-labels">
                 <span>0</span>
-                <span>{{ comp.species_par_min | round(0) | int }} mín</span>
-                <span>{{ comp.species_par_optimal | round(0) | int }} ópt</span>
+                <span>{{ comp.species_par_min | round(0) | int }} {{ 'min' if _lang == 'en' else 'mín' }}</span>
+                <span>{{ comp.species_par_optimal | round(0) | int }} {{ 'opt' if _lang == 'en' else 'ópt' }}</span>
                 <span>{{ comp.species_par_max | round(0) | int }} máx</span>
             </div>
         </div>
@@ -201,19 +208,19 @@
 <!-- Sol bajo el horizonte -->
 <div class="card night-card">
     <div class="night-icon">🌙</div>
-    <h2>El sol está bajo el horizonte</h2>
-    <p>No hay luz solar disponible en este momento en tu ubicación.</p>
+    <h2>{{ t('night.title', _lang) }}</h2>
+    <p>{{ t('night.body', _lang) }}</p>
     <div class="night-stats">
         <div class="stat">
             <span class="stat-value">{{ report.daylight_hours | round(0) | int }}</span>
-            <span class="stat-unit">horas</span>
-            <span class="stat-label">Horas de luz hoy</span>
+            <span class="stat-unit">{{ 'h' }}</span>
+            <span class="stat-label">{{ t('night.hours_today', _lang) }}</span>
         </div>
         <div class="stat">
             <span class="stat-value">{{ report.solar_position.elevation | round(1) }}°</span>
-            <span class="stat-label">Elevación solar</span>
+            <span class="stat-label">{{ t('night.solar_elev', _lang) }}</span>
         </div>
     </div>
-    <p class="night-tip">Usá el selector de fecha y hora para simular la luz a otro momento del día.</p>
+    <p class="night-tip">{{ t('night.tip', _lang) }}</p>
 </div>
 {% endif %}

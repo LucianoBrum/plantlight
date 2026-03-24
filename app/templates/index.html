@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}PlantLight — Calidad de luz solar para tus plantas{% endblock %}
+{% block title %}PlantLight — {{ t('site.tagline', lang or 'es') }}{% endblock %}
 
 {% block content %}
 <section class="hero">
     <div class="hero-text">
-        <h1>¿Cuánta luz solar<br><em>tienen tus plantas</em> hoy?</h1>
-        <p class="subtitle">Seleccioná tu ubicación en el mapa o usá la geolocalización para analizar la calidad de la luz solar en tiempo real.</p>
+        <h1>{{ t('home.hero_title', lang or 'es') | safe }}</h1>
+        <p class="subtitle">{{ t('home.hero_subtitle', lang or 'es') }}</p>
     </div>
 </section>
 
@@ -14,29 +14,29 @@
 <div class="map-section card">
     <div class="map-controls">
         <button id="btn-geolocate" class="btn-primary">
-            <span class="btn-icon">📍</span> Mi ubicación
+            <span class="btn-icon">📍</span> {{ t('home.btn_geolocate', lang or 'es') }}
         </button>
         <div class="map-coords" id="map-coords">
             <span id="coords-display">Buenos Aires, AR (-34.60, -58.40)</span>
         </div>
         <div class="datetime-picker">
-            <input type="datetime-local" id="input-datetime" title="Simular otro momento del día"/>
-            <button id="btn-datetime" class="btn-secondary">Calcular</button>
+            <input type="datetime-local" id="input-datetime" title="{{ t('home.datetime_title', lang or 'es') }}"/>
+            <button id="btn-datetime" class="btn-secondary">{{ t('home.btn_calculate', lang or 'es') }}</button>
         </div>
     </div>
     <div id="map"></div>
-    <p class="map-hint">Hacé click en cualquier punto del mapa para analizar esa ubicación.</p>
+    <p class="map-hint">{{ t('home.map_hint', lang or 'es') }}</p>
 </div>
 
 <div id="loading" class="loading hidden">
     <div class="spinner"></div>
-    <p>Calculando la luz solar…</p>
+    <p>{{ t('home.loading', lang or 'es') }}</p>
 </div>
 
 <div id="light-report-container">
     <div class="empty-state">
         <div class="empty-icon">🌤️</div>
-        <p>Hacé click en el mapa o usá <strong>"Mi ubicación"</strong> para ver el análisis de luz solar.</p>
+        <p>{{ t('home.empty_state', lang or 'es') }} <strong>"{{ t('home.btn_geolocate', lang or 'es') }}"</strong> {{ t('home.empty_state2', lang or 'es') }}</p>
     </div>
 </div>
 {% endblock %}

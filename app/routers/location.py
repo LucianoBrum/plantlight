@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 from app.models.schemas import LightReportRequest
 from app.services import solar, light_quality
 from app.template_engine import templates
+from app.i18n import get_lang
 
 router = APIRouter(prefix="/api", tags=["location"])
 
@@ -31,7 +32,7 @@ async def light_report(payload: LightReportRequest, request: Request):
 
     if "text/html" in request.headers.get("accept", ""):
         return templates.TemplateResponse(
-            request, "partials/light_report.html", {"report": report},
+            request, "partials/light_report.html", {"report": report, "lang": get_lang(request)},
         )
     return JSONResponse(content=report)
 

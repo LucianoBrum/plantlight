@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="{{ lang or 'es' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,9 +16,14 @@
     <header class="site-header">
         <a href="/" class="logo">🌿 PlantLight</a>
         <nav>
-            <a href="/" class="{% if request.url.path == '/' %}active{% endif %}">Inicio</a>
-            <a href="/species" class="{% if request.url.path == '/species' %}active{% endif %}">Especies</a>
+            <a href="/" class="{% if request.url.path == '/' %}active{% endif %}">{{ t('nav.home', lang or 'es') }}</a>
+            <a href="/species" class="{% if request.url.path == '/species' %}active{% endif %}">{{ t('nav.species', lang or 'es') }}</a>
         </nav>
+        <div class="lang-toggle-wrapper">
+            <button class="lang-btn {% if (lang or 'es') == 'es' %}lang-active{% endif %}" onclick="setLang('es')">ES</button>
+            <span class="lang-sep">|</span>
+            <button class="lang-btn {% if (lang or 'es') == 'en' %}lang-active{% endif %}" onclick="setLang('en')">EN</button>
+        </div>
     </header>
 
     <main>
@@ -26,7 +31,7 @@
     </main>
 
     <footer class="site-footer">
-        <p>PlantLight — Calidad de luz solar para tus plantas</p>
+        <p>PlantLight — {{ t('site.tagline', lang or 'es') }}</p>
     </footer>
 
     <script src="/static/js/app.js" defer></script>

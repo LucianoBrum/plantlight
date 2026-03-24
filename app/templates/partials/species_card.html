@@ -1,50 +1,51 @@
+{% set _lang = lang or 'es' %}
 {% if species_list %}
 {% for sp in species_list %}
 <div class="species-card" data-species-id="{{ sp.id }}" data-species-name="{{ sp.common_name }}">
     <div class="species-card-body">
         <div class="species-light-badge badge-{{ sp.light_requirement }}">
-            {% if sp.light_requirement == 'full_sun' %}☀️ Sol pleno
-            {% elif sp.light_requirement == 'partial_shade' %}⛅ Sombra parcial
-            {% elif sp.light_requirement == 'full_shade' %}🌑 Sombra total
-            {% else %}🔄 Variable{% endif %}
+            {% if sp.light_requirement == 'full_sun' %}☀️ {{ t('light.full_sun', _lang) }}
+            {% elif sp.light_requirement == 'partial_shade' %}⛅ {{ t('light.partial_shade', _lang) }}
+            {% elif sp.light_requirement == 'full_shade' %}🌑 {{ t('light.full_shade', _lang) }}
+            {% else %}🔄 {{ t('light.variable', _lang) }}{% endif %}
         </div>
         <h3 class="species-common-name">{{ sp.common_name }}</h3>
         <p class="species-sci-name"><em>{{ sp.scientific_name }}</em></p>
-        {% if sp.family %}<p class="species-family">Familia: {{ sp.family }}</p>{% endif %}
+        {% if sp.family %}<p class="species-family">{{ t('species.family', _lang) }} {{ sp.family }}</p>{% endif %}
 
         <div class="species-par-info">
             <div class="par-mini-stat">
                 <span class="par-value">{{ sp.par_optimal_umol | round(0) | int }}</span>
                 <span class="par-unit">µmol/m²/s</span>
-                <span class="par-label">PAR óptimo</span>
+                <span class="par-label">{{ t('species.par_optimal', _lang) }}</span>
             </div>
             <div class="par-mini-stat">
                 <span class="par-value">{{ sp.dli_optimal | round(0) | int }}</span>
-                <span class="par-unit">mol/m²/día</span>
-                <span class="par-label">DLI óptimo</span>
+                <span class="par-unit">mol/m²/{{ 'day' if _lang == 'en' else 'día' }}</span>
+                <span class="par-label">{{ t('species.dli_optimal', _lang) }}</span>
             </div>
         </div>
 
         {% if sp.photoperiod_type %}
         <div class="photoperiod-badge badge-{{ sp.photoperiod_type }}">
-            {% if sp.photoperiod_type == 'short_day' %}🌘 Día corto
-            {% elif sp.photoperiod_type == 'long_day' %}🌔 Día largo
-            {% else %}☯️ Neutro{% endif %}
+            {% if sp.photoperiod_type == 'short_day' %}🌘 {{ t('photo.short_day', _lang) }}
+            {% elif sp.photoperiod_type == 'long_day' %}🌔 {{ t('photo.long_day', _lang) }}
+            {% else %}☯️ {{ t('photo.neutral', _lang) }}{% endif %}
         </div>
         {% endif %}
     </div>
     <div class="species-card-actions">
         <button class="btn-species-detail" onclick="openSpeciesDetail({{ sp.id }})">
-            Ver análisis →
+            {{ t('species.view_analysis', _lang) }}
         </button>
         <button class="btn-species-select hidden" onclick="selectForCompare({{ sp.id }}, '{{ sp.common_name }}')">
-            + Seleccionar
+            {{ t('species.select', _lang) }}
         </button>
     </div>
 </div>
 {% endfor %}
 {% else %}
 <div class="no-results">
-    <p>No se encontraron especies. Probá con otro término.</p>
+    <p>{{ t('species.no_results', _lang) }}</p>
 </div>
 {% endif %}

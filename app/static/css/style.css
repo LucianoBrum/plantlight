@@ -830,6 +830,31 @@ input[type="datetime-local"]:focus { outline: none; border-color: var(--color-pr
     font-style: italic;
 }
 
+/* ---- Toggle de idioma ---- */
+.lang-toggle-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: 1rem;
+}
+.lang-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+.lang-btn:hover { color: var(--color-primary); }
+.lang-btn.lang-active {
+    color: var(--color-primary);
+    background: rgba(45,90,39,0.08);
+}
+.lang-sep { color: var(--color-border); font-size: 0.9rem; }
+
 /* ---- Utility ---- */
 .hidden { display: none !important; }
 

@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from app.models.schemas import SpeciesLightRequest, SpeciesCompareRequest
 from app.services import solar, light_quality, species_db
 from app.template_engine import templates
+from app.i18n import get_lang
 
 router = APIRouter(prefix="/api/species", tags=["species"])
 
@@ -23,7 +24,7 @@ async def search(request: Request, q: str = Query(default="")):
 
     if "text/html" in request.headers.get("accept", ""):
         return templates.TemplateResponse(
-            request, "partials/species_card.html", {"species_list": results},
+            request, "partials/species_card.html", {"species_list": results, "lang": get_lang(request)},
         )
     return JSONResponse(content=results)
 
@@ -51,6 +52,7 @@ async def compare_species(payload: SpeciesCompareRequest, request: Request):
         "comp2": comp2,
     }
 
+    context["lang"] = get_lang(request)
     if "text/html" in request.headers.get("accept", ""):
         return templates.TemplateResponse(request, "partials/species_compare.html", context)
     return JSONResponse(content=context)
@@ -81,6 +83,6 @@ async def species_light(species_id: int, payload: SpeciesLightRequest, request: 
 
     if "text/html" in request.headers.get("accept", ""):
         return templates.TemplateResponse(
-            request, "partials/light_report.html", {"report": report, "species": sp},
+            request, "partials/light_report.html", {"report": report, "species": sp, "lang": get_lang(request)},
         )
     return JSONResponse(content=report)

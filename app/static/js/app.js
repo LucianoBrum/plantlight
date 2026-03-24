@@ -467,6 +467,16 @@ function initGaugeColorIn(root) {
     gauge.style.setProperty('--gauge-color', color);
 }
 
+// ─── Toggle de idioma ────────────────────────────────────────────────────
+async function setLang(lang) {
+    await fetch('/set-lang', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lang }),
+    });
+    window.location.reload();
+}
+
 // ─── Modo comparación de especies ────────────────────────────────────────
 let compareMode = false;
 let compareSlots = [null, null]; // [{id, name}, {id, name}]
